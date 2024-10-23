@@ -1,6 +1,7 @@
 numpy 
 pandas
 dask
+selenium
 dash
 matplotlib
 scikit-learn
