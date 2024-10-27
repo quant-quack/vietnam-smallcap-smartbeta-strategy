@@ -1,6 +1,8 @@
-from utils import *
+from utils.data_retrieval import * 
+from utils.gics_crawler import Crawler
 
 from glob import glob
+import time
 import shutil
 import logging
 
@@ -41,12 +43,9 @@ if __name__ == '__main__':
     inprogress_retrieved = total_symbol.difference(complete_retrieved)
     
     print(f"Retrieving historical data for {len(inprogress_retrieved)} symbols...")
-    
     # Fetch historical data for all symbols
     results = fetch_all_symbols(stock=stock, source=source, symbols=inprogress_retrieved, start=start, end=end, interval=interval,fetch_type='historical')
-    
     print(f"Complete fetching data for {len(results)} symbols.")
-    
     print() 
     
     # RETRIEVE FUNDAMENTAL DATA
@@ -55,11 +54,16 @@ if __name__ == '__main__':
     inprogress_retrieved = total_symbol.difference(complete_retrieved)
     
     print(f"Retrieving fundamental data for {len(inprogress_retrieved)} symbols...")
-    
     # Fetch fundamental data for all symbols
     results = fetch_all_symbols(stock=stock, source=source, symbols=inprogress_retrieved, start=start, end=end, interval=interval,fetch_type='fundamental')
-    
     print(f"Complete fetching data for {len(results)} symbols.")
+    print()
     
+    # RETRIEVE GICS DATA
+    # Initial Crawler
+    gics_crawler = Crawler()
+    
+    # Get GICS data
+    gics_crawler.crawl_gics_data()
     
     

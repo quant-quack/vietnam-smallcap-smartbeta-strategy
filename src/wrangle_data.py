@@ -18,3 +18,4 @@ pd.set_option('display.float_format', '{:.6f}'.format)
 np.set_printoptions(suppress=True)
 pio.templates.default = 'plotly_white'
 
+

@@ -1,5 +1,7 @@
 numpy 
 pandas
+lxml
+html5lib
 dask
 selenium
 dash
