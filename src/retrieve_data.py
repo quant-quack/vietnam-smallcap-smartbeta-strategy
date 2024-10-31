@@ -1,5 +1,6 @@
 from utils.data_retrieval import * 
-from utils.gics_crawler import Crawler
+from utils.crawler import GicsCrawler, BenchmarkCrawler
+
 
 from glob import glob
 import time
@@ -59,11 +60,14 @@ if __name__ == '__main__':
     print(f"Complete fetching data for {len(results)} symbols.")
     print()
     
-    # RETRIEVE GICS DATA
-    # Initial Crawler
-    gics_crawler = Crawler()
+    # # RETRIEVE GICS DATA
+    # gics_crawler = GicsCrawler()
+    # gics_crawler.crawl_gics_data()
     
-    # Get GICS data
-    gics_crawler.crawl_gics_data()
+    # RETRIEVE BENCHMARK DATA
+    benchmark_crawler = BenchmarkCrawler()
+    benchmark_crawler.crawl_benchmark_data()
+    
+    
     
     

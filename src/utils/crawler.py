@@ -8,7 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 import pandas as pd
 
-class Crawler:     
+class GicsCrawler:     
     def __init__(self):
         self.table_dfs = [] 
         self.email = 'gbn20668@dcobe.com'
@@ -78,3 +78,34 @@ class Crawler:
         finally: 
             self.driver.quit()
 
+class BenchmarkCrawler:     
+    def __init__(self):
+        self.driver = self.__setup_driver()
+        
+    def __setup_driver(self): 
+        # Configure Chrome
+        self.options = webdriver.ChromeOptions()
+        self.options.add_argument("--no-sandbox")
+        self.options.add_argument("--start-maximized")
+        self.options.page_load_strategy = 'eager'
+        
+        return webdriver.Chrome(options=self.options)    
+        
+    def __accept_and_collect_table(self): 
+        # Navigate to url
+        self.driver.get("https://www.dragoncapital.com/vef/")
+
+        # Find Accept button
+        accept_btn = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#popmake-4108 > button")))
+        accept_btn.click()
+        
+        table = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#performance > div:nth-child(4) > table.bg-negative.stackcolumns.stacktable.large-only")))  
+        
+        return pd.read_html(table.get_attribute("outerHTML"))[0]
+            
+    def crawl_benchmark_data(self): 
+        try:
+            table_data = self.__accept_and_collect_table()   
+            table_data.to_csv('../data/benchmark/dc_performance.csv')             
+        finally: 
+            self.driver.quit()
