@@ -10,18 +10,18 @@ import pandas as pd
 
 class GicsCrawler:     
     def __init__(self):
-        self.table_dfs = [] 
         self.email = 'gbn20668@dcobe.com'
         self.password = '123456'
-        self.__driver_config() 
-        self.driver = webdriver.Chrome(options=self.options)
+        self.driver = self.__setup_driver() 
         
-    def __driver_config(self): 
+    def __setup_driver(self): 
         # Configure Chrome
         self.options = webdriver.ChromeOptions()
         self.options.add_argument("--no-sandbox")
         self.options.add_argument("--start-maximized")
-        self.options.page_load_strategy = 'eager'        
+        self.options.page_load_strategy = 'eager' 
+        
+        return webdriver.Chrome(options=self.options)       
         
     def __login(self): 
         # Navigate to url
@@ -32,48 +32,45 @@ class GicsCrawler:
         loggin_btn.click()
 
         # Fill in login information
-        email_field = self.driver.find_element(by=By.CSS_SELECTOR, value="#txtEmailLogin")
-        password_field = self.driver.find_element(by=By.CSS_SELECTOR, value="#txtPassword")
+        self.driver.find_element(by=By.CSS_SELECTOR, value="#txtEmailLogin").send_keys(self.email)
+        self.driver.find_element(by=By.CSS_SELECTOR, value="#txtPassword").send_keys(self.password)
+        self.driver.find_element(by=By.CSS_SELECTOR, value="#btnLoginAccount").click()
 
-        email_field.send_keys(self.email)
-        password_field.send_keys(self.password)
-        
-        submit_btn = self.driver.find_element(by=By.CSS_SELECTOR, value="#btnLoginAccount")
-        submit_btn.click()
-
-    def __get_table_data(self): 
+    def __get_all_pages_data(self): 
+        # Select 50 entries per page
         select_menu = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#az-container > div:nth-child(1) > div.pull-right > div > select")))
         Select(select_menu).select_by_value("50")
-
-        table = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#az-container > div.table-responsive.clear-fix.no-m-b > table")))  
-        tmp_table = pd.read_html(table.get_attribute("outerHTML"))
         
-        self.table_dfs.append(tmp_table[0])
+        table_dfs = []
+        
+        while True: 
+            table = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#az-container > div.table-responsive.clear-fix.no-m-b > table")))  
+            table_dfs.append(pd.read_html(table.get_attribute("outerHTML"))[0])
 
-        for i in range(65):
-            next_btn = self.driver.find_element(By.CSS_SELECTOR, "#btn-page-next")
-            next_btn.click()
-            next_table = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#az-container > div.table-responsive.clear-fix.no-m-b > table")))  
-            tmp_table = pd.read_html(next_table.get_attribute("outerHTML"))
-            self.table_dfs.append(tmp_table[0])
+            # Check if the next button is disabled
+            try: 
+                next_btn = self.driver.find_element(By.CSS_SELECTOR, "#btn-page-next")
+                if not next_btn.is_enabled(): 
+                    break # Exit loop if no more pages
+                next_btn.click()
+            except: 
+                break # Exit loop if the button is not found
+            
+        return pd.concat(table_dfs, axis=0)
             
     def crawl_gics_data(self): 
         try:
             # Login into Vietstock
             self.__login() 
             
-            # Wait for 5 second
             time.sleep(5)
             
-            # Get table data
-            self.__get_table_data()
-            
-            # Concatenate the results
-            concat_table = pd.concat(self.table_dfs, axis=0)
-            
-            if concat_table.shape[0] == 3275: 
-                concat_table.to_csv("../data/gics/gics.csv", index=False)
-                print(f"Complete crawling data for {concat_table.shape[0]}. ")
+            # Get all table data
+            gics_data = self.__get_all_pages_data()
+            print(gics_data.shape)
+            if gics_data.shape[0] == 3325: 
+                gics_data.to_csv("../data/gics/gics.csv", index=False)
+                print(f"Data successfully crawled for {gics_data.shape[0]} symbol.")
                 
         finally: 
             self.driver.quit()

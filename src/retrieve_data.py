@@ -1,4 +1,4 @@
-from utils.data_retrieval import * 
+from utils.market_data_fetcher import * 
 from utils.crawler import GicsCrawler, BenchmarkCrawler
 
 
@@ -60,9 +60,9 @@ if __name__ == '__main__':
     print(f"Complete fetching data for {len(results)} symbols.")
     print()
     
-    # # RETRIEVE GICS DATA
-    # gics_crawler = GicsCrawler()
-    # gics_crawler.crawl_gics_data()
+    # RETRIEVE GICS DATA
+    gics_crawler = GicsCrawler()
+    gics_crawler.crawl_gics_data()
     
     # RETRIEVE BENCHMARK DATA
     benchmark_crawler = BenchmarkCrawler()

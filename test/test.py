@@ -46,6 +46,9 @@ class Crawler:
             # Get table data
             self.__get_table_data()
             
+            # Concatenate the results
+            concat_table = pd.concat(self.table_list, axis=0)
+            
             concat_table.to_csv("../data/benchmark/dc_performance.csv", index=False, header=1)
                 
         finally: 
