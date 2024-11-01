@@ -1,4 +1,5 @@
 import pandas as pd
+from alive_progress import alive_bar
 
 import time
 import concurrent.futures
@@ -26,11 +27,11 @@ def get_historical_data(stock, symbol, start, end, interval='1D', max_retries=10
     retries = 0  # Count the number of retries for each symbol
     while retries <= max_retries:
         try:
-            print(f'Processing: {symbol} ...')
+            # print(f'Processing: {symbol} ...')
             tmp = stock.quote.history(symbol=symbol, start=start, end=end, interval=interval)
             tmp['ticker'] = symbol                
             tmp.to_csv(f'../data/historical_data/{symbol}.csv', index=False)
-            print(f"Successfully processed {symbol}")
+            # print(f"Successfully processed {symbol}")
             
             return symbol  # If successful, return symbol
         
@@ -40,15 +41,15 @@ def get_historical_data(stock, symbol, start, end, interval='1D', max_retries=10
                 retries += 1
                 if retries <= max_retries:
                     wait_time = initial_delay * (2 ** (retries - 1))  # Double the wait time for each retry
-                    print(f"Too Many Requests for {symbol}. Retrying in {wait_time} seconds... (Attempt {retries}/{max_retries})")
+                    # print(f"Too Many Requests for {symbol}. Retrying in {wait_time} seconds... (Attempt {retries}/{max_retries})")
                     time.sleep(wait_time)
                 else:
-                    print(f"Failed to process {symbol} after {max_retries} retries.")
+                    # print(f"Failed to process {symbol} after {max_retries} retries.")
                     
                     return None
             else:
                 # Handle other exceptions
-                print(f"Error processing {symbol}: {e}")
+                # print(f"Error processing {symbol}: {e}")
                 
                 return None    
             
@@ -56,7 +57,7 @@ def get_fundamental_data(symbol, source, max_retries=10, initial_delay=2):
     retries = 0  # Count the number of retries for each symbol
     while retries <= max_retries:
         try:
-            print(f'Processing: {symbol}')
+            # print(f'Processing: {symbol}')
             stock = Vnstock().stock(symbol=symbol, source=source)                
             tmp = stock.finance.ratio(period='quarter').droplevel(0, axis=1)
             mapper = {
@@ -75,14 +76,14 @@ def get_fundamental_data(symbol, source, max_retries=10, initial_delay=2):
                 retries += 1
                 if retries <= max_retries:
                     wait_time = initial_delay * (2 ** (retries - 1))  # Double the wait time for each retry
-                    print(f"Too Many Requests for {symbol}. Retrying in {wait_time} seconds... (Attempt {retries}/{max_retries})")
+                    # print(f"Too Many Requests for {symbol}. Retrying in {wait_time} seconds... (Attempt {retries}/{max_retries})")
                     time.sleep(wait_time)
                 else:
-                    print(f"Failed to process {symbol} after {max_retries} retries.")
+                    # print(f"Failed to process {symbol} after {max_retries} retries.")
                     return None
             else:
                 # Handle other exceptions
-                print(f"Error processing {symbol}: {e}")
+                # print(f"Error processing {symbol}: {e}")
                 
                 return None
             
@@ -99,7 +100,7 @@ def fetch_all_symbols(stock, source, symbols, start, end, interval, fetch_type):
         else: 
             future_to_symbol = {executor.submit(get_fundamental_data, symbol, source): symbol for symbol in symbols} # Initialize placeholder for symbols
             
-        
+    with alive_bar(len(future_to_symbol)) as bar:     
         for future in concurrent.futures.as_completed(future_to_symbol): 
             # Try to get the result from the placeholder, if not raise an error
             symbol = future_to_symbol[future]
@@ -108,6 +109,7 @@ def fetch_all_symbols(stock, source, symbols, start, end, interval, fetch_type):
                 if result: 
                     results.append(result)
             except Exception as exc: 
-                print(f"{symbol} generated error: {exc}")            
+                print(f"{symbol} generated error: {exc}")
+            bar()            
 
     return results

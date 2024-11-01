@@ -63,6 +63,7 @@ if __name__ == '__main__':
     # RETRIEVE GICS DATA
     gics_crawler = GicsCrawler()
     gics_crawler.crawl_gics_data()
+    print()
     
     # RETRIEVE BENCHMARK DATA
     benchmark_crawler = BenchmarkCrawler()

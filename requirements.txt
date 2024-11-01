@@ -1,5 +1,6 @@
 numpy 
 pandas
+alive-progress
 lxml
 html5lib
 dask
