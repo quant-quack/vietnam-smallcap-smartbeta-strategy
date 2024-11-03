@@ -43,13 +43,14 @@ class GicsCrawler:
         select_menu = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#az-container > div:nth-child(1) > div.pull-right > div > select")))
         Select(select_menu).select_by_value("50")
         
-        pages_elem = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "/html/body/div[1]/div[17]/div/div/div[1]/div/div/div[2]/div/div/div[1]/div[2]/div/span[1]/span[2]")))
-        total_page = pages_elem.text
+        # Retrieve the total page count
+        pages_elem = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div[17]/div/div/div[1]/div/div/div[2]/div/div/div[1]/div[2]/div/span[1]/span[2]")))
+        total_page = int(pages_elem.text)
         
         table_dfs = []
         
         print("Scrapping GICS data ...")
-        with alive_bar(int(total_page)) as bar: 
+        with alive_bar(total_page) as bar: 
             while True: 
                 table = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#az-container > div.table-responsive.clear-fix.no-m-b > table")))  
                 table_dfs.append(pd.read_html(StringIO(table.get_attribute("outerHTML")))[0])
@@ -72,7 +73,7 @@ class GicsCrawler:
             # Login into Vietstock
             self.__login() 
             
-            time.sleep(5)
+            time.sleep(6)
             
             # Get all table data
             gics_data = self.__get_all_pages_data()

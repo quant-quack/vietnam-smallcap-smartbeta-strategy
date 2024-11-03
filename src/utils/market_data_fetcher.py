@@ -93,23 +93,23 @@ def fetch_all_symbols(stock, source, symbols, start, end, interval, fetch_type):
     results = [] # List used to store retrieved results
     max_workers = 20 # Maximum number of threads used 
     
-    # Use ThreadPool to fetch data
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor: 
-        if fetch_type == 'historical': 
-            future_to_symbol = {executor.submit(get_historical_data, stock, symbol, start, end, interval): symbol for symbol in symbols} # Initialize placeholder for symbols
-        else: 
-            future_to_symbol = {executor.submit(get_fundamental_data, symbol, source): symbol for symbol in symbols} # Initialize placeholder for symbols
-            
-    with alive_bar(len(future_to_symbol)) as bar:     
-        for future in concurrent.futures.as_completed(future_to_symbol): 
-            # Try to get the result from the placeholder, if not raise an error
-            symbol = future_to_symbol[future]
-            try:
-                result = future.result() 
-                if result: 
-                    results.append(result)
-            except Exception as exc: 
-                print(f"{symbol} generated error: {exc}")
+    with alive_bar(len(symbols)) as bar:     
+        # Use ThreadPool to fetch data
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor: 
+            if fetch_type == 'historical': 
+                future_to_symbol = {executor.submit(get_historical_data, stock, symbol, start, end, interval): symbol for symbol in symbols} # Initialize placeholder for symbols
+            else: 
+                future_to_symbol = {executor.submit(get_fundamental_data, symbol, source): symbol for symbol in symbols} # Initialize placeholder for symbols
+                
+            for future in concurrent.futures.as_completed(future_to_symbol): 
+                # Try to get the result from the placeholder, if not raise an error
+                symbol = future_to_symbol[future]
+                try:
+                    result = future.result() 
+                    if result: 
+                        results.append(result)
+                except Exception as exc: 
+                    print(f"{symbol} generated error: {exc}")
             bar()            
 
     return results
