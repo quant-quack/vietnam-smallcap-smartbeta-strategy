@@ -78,9 +78,16 @@ class GicsCrawler:
             # Get all table data
             gics_data = self.__get_all_pages_data()
             
-            if gics_data.shape[0] == 3325: 
-                gics_data.to_csv("../data/gics/gics.csv", index=False)
-                print(f"Data successfully crawled for {gics_data.shape[0]} symbol.")
+            gics_data = gics_data.drop(columns=['STT', 'Tên công ty'])
+            gics_data = gics_data.rename(columns={
+                                                    'Mã CK▲': 'ticker',
+                                                    'Ngành': 'sector',
+                                                    'Sàn': 'exchange',
+                                                    'Khối lượng NY/ĐKGD': 'volume of listed'
+                                                    })
+            
+            gics_data.to_csv("../data/gics/gics.csv", index=False, encoding='utf-8')
+            print(f"Data successfully crawled for {gics_data.shape[0]} symbol.")
                 
         finally: 
             self.driver.quit()
@@ -113,7 +120,7 @@ class BenchmarkCrawler:
     def crawl_benchmark_data(self): 
         try:
             table_data = self.__accept_and_collect_table()   
-            table_data.to_csv('../data/benchmark/dc_performance.csv')
+            table_data.to_csv('../data/benchmark/dc_performance.csv', index=False)
             print("Benchmark data crawling complete.")             
         finally: 
             self.driver.quit()

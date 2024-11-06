@@ -1,5 +1,5 @@
-from utils.market_data_fetcher import * 
-from utils.crawler import GicsCrawler, BenchmarkCrawler
+from utils.data_fetcher import * 
+from utils.data_crawler import GicsCrawler, BenchmarkCrawler
 
 
 from glob import glob
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     end='2023-12-31'
     interval='1D'
     symbol='VNINDEX'
-    source='VCI'
+    source='TCBS'
 
 
 
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     
     print(f"Retrieving fundamental data for {len(inprogress_retrieved)} symbols...")
     # Fetch fundamental data for all symbols
-    results = fetch_all_symbols(stock=stock, source=source, symbols=inprogress_retrieved, start=start, end=end, interval=interval,fetch_type='fundamental')
+    results = fetch_all_symbols(stock=stock, source='VCI', symbols=inprogress_retrieved, start=start, end=end, interval=interval,fetch_type='fundamental')
     print(f"Complete fetching data for {len(results)} symbols.")
     print()
     

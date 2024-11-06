@@ -91,7 +91,7 @@ def get_fundamental_data(symbol, source, max_retries=10, initial_delay=2):
             
 def fetch_all_symbols(stock, source, symbols, start, end, interval, fetch_type): 
     results = [] # List used to store retrieved results
-    max_workers = 20 # Maximum number of threads used 
+    max_workers = 8 # Maximum number of threads used 
     
     with alive_bar(len(symbols)) as bar:     
         # Use ThreadPool to fetch data

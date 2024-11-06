@@ -4,6 +4,7 @@ alive-progress
 lxml
 html5lib
 dask
+dask[dataframe]
 selenium
 dash
 matplotlib
