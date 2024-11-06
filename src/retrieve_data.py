@@ -1,5 +1,5 @@
-from utils.data_fetcher import * 
-from utils.data_crawler import GicsCrawler, BenchmarkCrawler
+from utils.data_utils.data_fetcher import * 
+from utils.data_utils.data_crawler import GicsCrawler, BenchmarkCrawler
 
 
 from glob import glob

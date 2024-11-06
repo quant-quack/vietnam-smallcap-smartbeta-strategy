@@ -162,9 +162,3 @@ class Wrangler:
     
     def get_processed_fundamental_data(self, exclude_finsector=True): 
         return self.__process_fundamental_data(exclude_finsector)
-
-
-
-
-
-
