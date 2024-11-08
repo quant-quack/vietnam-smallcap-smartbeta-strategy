@@ -3,7 +3,7 @@ import dask.dataframe as dd
 import numpy as np
 from glob import glob
 
-class Wrangler: 
+class Handler: 
     def __init__(self, benchmark_dir, fundamental_csv_dir, historic_csv_dir, gics_csv_dir): 
         self.benchmark_dir = benchmark_dir
         self.fundamental_csv_dir = fundamental_csv_dir
@@ -12,11 +12,27 @@ class Wrangler:
 
 
     def __process_benchmark_data(self): 
-        df = pd.read_csv(self.benchmark_dir, header=1, index_col=0)
-        df = df.drop(columns='YTD')
-        df.index = df.index.astype("int16")
-        df = df.div(100)
+        df = pd.read_csv(self.benchmark_dir, 
+                         header=1, 
+                         index_col=0,
+                         usecols=['Unnamed: 0','Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct',
+                                  'Nov', 'Dec'])
         
+        df.index = df.index.astype("int16")
+        
+        time = (pd.to_datetime((df.stack().index.get_level_values(0).astype('str') +
+                              ' ' +
+                              df.stack().index.get_level_values(1)),
+                              format='%Y %b') + 
+               pd.offsets.MonthEnd(0))
+        
+        df = (df.stack()
+                .reset_index(drop=True)
+                .to_frame(name='benchmark')
+                .div(100))
+        
+        df['time'] = time
+                
         return df
     
     def __process_sector_data(self): 
