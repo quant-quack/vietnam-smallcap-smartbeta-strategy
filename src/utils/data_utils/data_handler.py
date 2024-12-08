@@ -145,7 +145,7 @@ class Handler:
     def __process_fundamental_data(self, exclude_finsector): 
         universe_fundmental_dir = [self.fundamental_csv_dir + f'{symbol}.csv' for symbol in self.__define_universe(exclude_finsector)]
         
-        fundamental_data = dd.read_csv(universe_fundmental_dir)
+        fundamental_data = dd.read_csv(universe_fundmental_dir, assume_missing=True)
         
         meta = pd.DataFrame({
                              'ticker': pd.Series(dtype='string'),
@@ -156,7 +156,7 @@ class Handler:
                             })
 
         fundamental_data = fundamental_data.map_partitions(self.__map_fundamental_data, meta=meta)
-        processed_fundamental_data = fundamental_data.compute(assume_missing=True) 
+        processed_fundamental_data = fundamental_data.compute() 
         processed_fundamental_data = processed_fundamental_data.reset_index(drop=True)
         
         return processed_fundamental_data

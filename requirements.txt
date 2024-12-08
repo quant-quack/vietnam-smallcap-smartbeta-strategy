@@ -10,5 +10,6 @@ dash
 matplotlib
 scikit-learn
 plotly
+datashader
 vnstock3
 jupyter
