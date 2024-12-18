@@ -1,5 +1,6 @@
 numpy 
 pandas
+hdbscan
 alive-progress
 lxml
 html5lib
@@ -9,6 +10,7 @@ selenium
 dash
 matplotlib
 scikit-learn
+umap-learn
 plotly
 datashader
 vnstock3
