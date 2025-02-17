@@ -1,8 +1,12 @@
 import pandas as pd
 import numpy as np
+
 from portfolio.portfolio import Portfolio
 from mom_signal.mom_signal import MomentumSignal
 from strategy.strategy import AbnormalMomentumStatey
+
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 from alive_progress import alive_bar
 
@@ -12,7 +16,7 @@ class Backtest(Portfolio, MomentumSignal):
             self.performance_dfs = []
             self.portfolio_features = []
 
-    def run(self): 
+    def run(self, abnormal=False, exclude_abnormal=False): 
         past_formation_dfs, future_holding_dfs = self.portfolio.get_walk_forward_splits()
         formed_portfolio_list = self.portfolio.get_formed_portfolio()
             
@@ -34,7 +38,8 @@ class Backtest(Portfolio, MomentumSignal):
                 
                 formed_portfolio = formed_portfolio.dropna()
                 
-                self.portfolio_features.append(formed_portfolio)
+                
+                self.portfolio_features.append(formed_portfolio.copy())
                 
                 #################################################
                 ##                                             ##
@@ -43,8 +48,21 @@ class Backtest(Portfolio, MomentumSignal):
                 #################################################
                 
                 
-                # Divide stocks in the portfolio into 3 market capitalization groups and for each group, we use only stocks with abnormal momentum to construct our portfolio
+                # Divide stocks in the portfolio into 3 market capitalization groups and for each group, 
                 formed_portfolio['cap_groups'] = formed_portfolio['log_mcap'].transform(lambda x: pd.qcut(x, [0, .3, .7, 1], labels=['bottom', 'mid', 'top']))
+                
+                if abnormal:
+                    # Find stocks with abnormal momentum 
+                    formed_portfolio['mom_label'] = AbnormalMomentumStatey().find_cluster(formed_portfolio=formed_portfolio)
+
+                    if exclude_abnormal: 
+                        # Exclude stock fwith abnormal momentum to construct our portfolio
+                        formed_portfolio.query('mom_label != -1', inplace=True)
+                    else: 
+                        # Filter out stock with abnormal momentum to construct our portfolio
+                        formed_portfolio.query('mom_label == -1', inplace=True)
+                
+                # For each capitalization group, calculate weight of stocks in the portfolio
                 formed_portfolio[['cmom_weights', 'mmom_weights', 'tmom_weights', 'pmom_weights']] = formed_portfolio.groupby('cap_groups', observed=True)[['CMOM', 'MMOM', 'TMOM', 'PMOM']].transform(lambda x: (1/len(x) * (x - x.mean())))
                 
                 # Get future return

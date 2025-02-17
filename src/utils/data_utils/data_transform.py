@@ -4,11 +4,12 @@ import numpy as np
 class DataTransform:
     idx = pd.IndexSlice
 
-    def __init__(self, benchmark, fun_data, hist_data, start_time='2013-01-01'): 
+    def __init__(self, benchmark, fun_data, hist_data, start_time='2013-01-01', end_time='2023-12-31'): 
         self.benchmark = benchmark
         self.fun_data = fun_data
         self.hist_data = hist_data        
         self.start_time = start_time
+        self.end_time = end_time
         
     def __transform_data(self): 
         daily = self.hist_data.copy()
@@ -25,7 +26,7 @@ class DataTransform:
         long_monthly['yearReport'] = long_monthly.index.get_level_values(0).year
         long_monthly['lengthReport'] = long_monthly.index.get_level_values(0).quarter
 
-        long_monthly = long_monthly.loc[self.idx[self.start_time:, :], :]
+        long_monthly = long_monthly.loc[self.idx[self.start_time:self.end_time, :], :]
         long_monthly = long_monthly.reset_index()
 
         long_monthly = pd.merge(long_monthly, self.fun_data, how='left', on=['ticker', 'yearReport', 'lengthReport'])

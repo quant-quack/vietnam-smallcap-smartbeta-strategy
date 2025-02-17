@@ -13,7 +13,7 @@ class AbnormalMomentumStatey:
         for min_sample in min_sample_grid: 
             for min_cluster_size in min_cluster_size_grid: 
                 
-                clf = HDBSCAN(min_samples=min_sample, min_cluster_size=min_cluster_size)
+                clf = HDBSCAN(min_samples=min_sample, min_cluster_size=min_cluster_size, core_dist_n_jobs=8)
                 clf.fit(scaled_feature)
                 
                 if len(clf.cluster_persistence_) == 0:
@@ -34,7 +34,7 @@ class AbnormalMomentumStatey:
         
         best_min_sample, best_min_cluster_size, _ = self.__hyperparameter_search(scaled_feature)
         
-        clf = HDBSCAN(min_samples=best_min_sample, min_cluster_size=best_min_cluster_size)
+        clf = HDBSCAN(min_samples=best_min_sample, min_cluster_size=best_min_cluster_size, core_dist_n_jobs=8)
         clf.fit(scaled_feature)
         
         return clf.labels_

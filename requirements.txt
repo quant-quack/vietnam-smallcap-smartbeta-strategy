@@ -1,5 +1,7 @@
-numpy 
+numpy
 pandas
+scipy
+seaborn
 hdbscan
 alive-progress
 lxml
@@ -12,6 +14,9 @@ matplotlib
 scikit-learn
 umap-learn
 plotly
-datashader
+streamlit
 vnstock3
+pyfolio-reloaded
+empyrical-reloaded
+PyPortfolioOpt
 jupyter
