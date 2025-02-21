@@ -43,26 +43,20 @@ class Backtest(Portfolio, MomentumSignal):
                 
                 # self.portfolio_features.append(formed_portfolio.copy())
                 
-                #################################################
-                ##                                             ##
-                ##        IMPLEMENT HDBSCAN HERE!!!!!!         ##
-                ##                                             ##
-                #################################################
-                
-                
                 # Divide stocks in the portfolio into 3 market capitalization groups and for each group, 
                 formed_portfolio['cap_groups'] = formed_portfolio['log_mcap'].transform(lambda x: pd.qcut(x, [0, .3, .7, 1], labels=['bottom', 'mid', 'top']))
                 
-                if abnormal:
-                    # Find stocks with abnormal momentum 
-                    formed_portfolio['mom_label'] = AbnormalMomentumStatey().find_cluster(formed_portfolio=formed_portfolio)
+                ## THIS BLOCK IS FOR TESTING !!!
+                # if abnormal:
+                #     # Find stocks with abnormal momentum 
+                #     formed_portfolio['mom_label'] = AbnormalMomentumStatey().find_cluster(formed_portfolio=formed_portfolio)
 
-                    if exclude_abnormal: 
-                        # Exclude stock fwith abnormal momentum to construct our portfolio
-                        formed_portfolio.query('mom_label != -1', inplace=True)
-                    else: 
-                        # Filter out stock with abnormal momentum to construct our portfolio
-                        formed_portfolio.query('mom_label == -1', inplace=True)
+                #     if exclude_abnormal: 
+                #         # Exclude stock fwith abnormal momentum to construct our portfolio
+                #         formed_portfolio.query('mom_label != -1', inplace=True)
+                #     else: 
+                #         # Filter out stock with abnormal momentum to construct our portfolio
+                #         formed_portfolio.query('mom_label == -1', inplace=True)
                 
                 # For each capitalization group, calculate weight of stocks in the portfolio
                 formed_portfolio[['cmom_weights', 'mmom_weights', 'tmom_weights', 'pmom_weights']] = formed_portfolio.groupby('cap_groups', observed=True)[['CMOM', 'MMOM', 'TMOM', 'PMOM']].transform(lambda x: (1/len(x) * (x - x.mean())))
