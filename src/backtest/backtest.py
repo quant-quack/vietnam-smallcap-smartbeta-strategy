@@ -30,6 +30,8 @@ class Backtest(Portfolio, MomentumSignal):
                 formed_portfolio = past_formation_period.stack(future_stack=True).loc[self.idx[:, selected_stocks], :]
                 formed_portfolio = formed_portfolio[mask_fields]
 
+                self.portfolio_features.append(formed_portfolio.copy())
+
                 # Calculate Momentum Mesures
                 formed_portfolio['CMOM'] = formed_portfolio.groupby(level=1)['r'].transform(lambda x: self.calculate_cmom(x))
                 formed_portfolio['MMOM'] = formed_portfolio.groupby(level=1)['r'].transform(lambda x: self.calculate_mmom(x))
@@ -39,7 +41,7 @@ class Backtest(Portfolio, MomentumSignal):
                 formed_portfolio = formed_portfolio.dropna()
                 
                 
-                self.portfolio_features.append(formed_portfolio.copy())
+                # self.portfolio_features.append(formed_portfolio.copy())
                 
                 #################################################
                 ##                                             ##
