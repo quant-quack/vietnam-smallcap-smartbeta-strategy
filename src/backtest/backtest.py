@@ -14,7 +14,8 @@ class Backtest(Portfolio, MomentumSignal):
     def __init__(self, portfolio: Portfolio):
             self.portfolio = portfolio 
             self.performance_dfs = []
-            self.portfolio_features = []
+            self.cov_data = []
+            self.in_sample_data = []
 
     def run(self, abnormal=False, exclude_abnormal=False): 
         past_formation_dfs, future_holding_dfs = self.portfolio.get_walk_forward_splits()
@@ -30,7 +31,7 @@ class Backtest(Portfolio, MomentumSignal):
                 formed_portfolio = past_formation_period.stack(future_stack=True).loc[self.idx[:, selected_stocks], :]
                 formed_portfolio = formed_portfolio[mask_fields]
 
-                self.portfolio_features.append(formed_portfolio.copy())
+                self.cov_data.append(formed_portfolio.copy())
 
                 # Calculate Momentum Mesures
                 formed_portfolio['CMOM'] = formed_portfolio.groupby(level=1)['r'].transform(lambda x: self.calculate_cmom(x))
@@ -41,7 +42,7 @@ class Backtest(Portfolio, MomentumSignal):
                 formed_portfolio = formed_portfolio.dropna()
                 
                 
-                # self.portfolio_features.append(formed_portfolio.copy())
+                self.in_sample_data.append(formed_portfolio.copy())
                 
                 # Divide stocks in the portfolio into 3 market capitalization groups and for each group, 
                 formed_portfolio['cap_groups'] = formed_portfolio['log_mcap'].transform(lambda x: pd.qcut(x, [0, .3, .7, 1], labels=['bottom', 'mid', 'top']))
