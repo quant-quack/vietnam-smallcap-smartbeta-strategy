@@ -115,6 +115,7 @@ w_j = \frac{MOM_j^{(k)} - MOM^{(k)}}{N}, \quad k = 1,2,3,4.
 ## Empirical Verification
 ![Price behaviour of different market capitalization groups](/reports/visualization/empirical_verification.png)
 ## Portfolio Optimization with Tracking-Error Constraints for Vietnam Stock Market
+![Impact of Scaling Factor on Sharpe Ratio](/reports/visualization/arbitrage_weighting.png)
 ![Impact of Scaling Factor on Sharpe Ratio](/reports/visualization/impact_of_lambda.png)
 ## Performance Report
 ![Performance Dashboard (Out-of-sample)](/reports/visualization/performance_dashboard.png)
