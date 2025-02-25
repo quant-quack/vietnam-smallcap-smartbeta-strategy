@@ -1,4 +1,4 @@
-# Vietnam Smart Beta Strategy: Optimizing Returns & Risk with Principal Component Momentum
+# Smart Beta Strategy: Leveraging the Negative Momentum Effect in Vietnam’s Market with Principal Component Momentum
 
 ## Introduction
 
