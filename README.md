@@ -1,7 +1,10 @@
 # Vietnam Smart Beta Strategy: Optimizing Returns & Risk with Principal Component Momentum
 
 ## Introduction
-The momentum effect, where stocks with high past performance continue to outperform those with poor past performance, has been well-documented in developed markets like the U.S. However, studies on Asian stock markets often reveal a negative momentum effect, where past losers tend to outperform past winners [Eom and Park](https://doi.org/10.1016/j.ribaf.2023.101908). This anomaly presents an opportunity to construct a Smart Beta Strategy that capitalizes on this negative momentum. This project verifies the negative momentum effect in the Vietnamese stock market using the Principal Component Momentum approach proposed by Eom and Park. Leveraging this effect, it further introduces a methodology for constructing and optimizing a Smart Beta Portfolio tailored to the Vietnamese market.
+
+The **momentum effect**, where **stocks with strong past performance continue to outperform** those with weak past performance, has been well-documented in **developed markets** like the **U.S.** However, studies on **Asian stock markets** often reveal a **negative momentum effect**, where **past losers tend to outperform past winners** [Eom and Park](https://doi.org/10.1016/j.ribaf.2023.101908). This anomaly presents an opportunity to construct a **Smart Beta Strategy** that **capitalizes on negative momentum**.  
+
+This project is inspired by the research of **Eom & Park** and aims to **verify the negative momentum effect** in the **Vietnamese stock market** using the **Principal Component Momentum approach** they proposed. Leveraging this effect, it further introduces a methodology for **constructing and optimizing a Smart Beta Portfolio** tailored to the **Vietnamese market**.
 
 ## Data and Methodology
 
@@ -103,16 +106,23 @@ where
 ```math
 w_j = \frac{MOM_j^{(k)} - MOM^{(k)}}{N}, \quad k = 1,2,3,4.
 ```
-### Backtesting Periods
+### Backtesting Framework and Periodicity
 109 months, from July 2013 to June 2023
 
 - **Formation and Holding Periods**
-  - Past formation period: **12 months.**
-  - Future holding period: **1 months.**
+  - Past formation period: **12-month.**
+  - Future holding period: **1-month.**
 - **Rolling of Subperiods**
   - The rolling of the subperiods adopts the non-overlapping holding period method.
 
 ## Empirical Verification
+To examine the **negative momentum effect** in the **Vietnamese market**, the **size-momentum portfolio** is constructed following the methodology of the original paper:  
+- **Step 1: Market Capitalization Classification**  
+  - All stocks are sorted by market capitalization and divided into three groups: **top 30%**, **middle 40%**, and **bottom 30%**.  
+- **Step 2: Size-Based Grouping**  
+  - The **top 30%** is classified as the **large-cap group**, while the **bottom 30%** is classified as the **small-cap group**.  
+- **Step 3: Momentum-Based Sorting**  
+  - Within both the **large-cap** and **small-cap** groups, stocks are further classified into **winner** and **loser** portfolios using the **arbitrage-weighting method**.
 ![Price behaviour of different market capitalization groups](/reports/visualization/empirical_verification.png)  
 *Figure 1: The image illustrates the price behavior of different market capitalization groups within the winner, loser, and arbitrage portfolios.*
 
@@ -133,23 +143,26 @@ The **abnormal performance of loser stocks** across all three **capitalization g
 ## Small-cap Smart Beta Strategy for Vietnam Stock Market
 The **loser stocks in the small-cap group** exhibit **significantly superior performance** compared to those in the **mid-cap and large-cap groups**. Consequently, this segment is selected as the **universe** for constructing the **smart beta momentum portfolio** tailored for the **Vietnamese market**.  
 
-However, since **short selling is not permitted** in Vietnam, adjustments are necessary to align with market constraints while **preserving the momentum allocation structure** of the **arbitrage-weighting method**—where stocks with **momentum deviations further from the mean** receive **larger weights**. 
+However, only the **top 30% of stocks with the most negative momentum** within the **loser portfolio of the small-cap group** are included in the portfolio construction.  
+
+Since **short selling is not permitted** in Vietnam, adjustments are necessary to align with **market constraints** while preserving the **momentum allocation structure** of the **arbitrage-weighting method**—where **stocks with momentum deviations further from the mean receive larger weights**.
 
 ![Arbitrage Weighting Method]( /reports/visualization/arbitrage_weighting.png )  
 *Figure 2: The image illustrates the momentum of individual stocks and the average momentum. Stocks with higher fluctuations relative to the mean (e.g., stock C) receive a higher weight allocation, whereas stocks with lower fluctuations (e.g., stock B) receive a lower weight allocation.*
 
-To accommodate a **long-only portfolio** while ensuring **all weights remain positive** and sum to **one**, the author applies the **`softmax` function** as a transformation mechanism. **For each portfolio weight vector $\mathbf{w}$ in the future holding period:** 
+To accommodate a **long-only portfolio** while ensuring **all weights remain positive** and sum to **one**, we apply the softmax function as a transformation mechanism. For each portfolio weight vector $\mathbf{w}$ in the future holding period:
 ```math
 w'_i = \frac{e^{w_i}}{\sum_{j} e^{w_j}}, \quad w'_i > 0, \quad \sum_{i} w'_i = 1.
 ```
-Small-cap stocks also tend to exhibit superior performance in January, consistent with the findings of [Haug and Hirschey (2006)](https://doi.org/10.2469/faj.v62.n5.4284), under the adjusted backtesting framework:  
+**Small-cap stocks** also tend to exhibit superior performance in **January**, consistent with the findings of [Haug and Hirschey (2006)](https://doi.org/10.2469/faj.v62.n5.4284), under the adjusted backtesting framework:  
 
-#### Backtesting Periods  
+#### Backtesting Framework and Periodicity
+
 121 months, spanning `January 2013` to `December 2023`.  
 
 #### Formation and Holding Periods  
-- **Formation period**: 12-month lookback.  
-- **Holding period**: 1-month forward.  
+- **Formation period**: 12-month.  
+- **Holding period**: 1-month.  
 
 #### Rolling of Subperiods  
 Subperiods are rolled using a **non-overlapping holding period** approach.  
@@ -192,7 +205,7 @@ $$
 where:
 - $w$: Portfolio weight vector  
 - $\Sigma$: Covariance matrix of asset returns  
-- $w^{\text{index}}$: Benchmark index weight vector  
+- $w^{\text{index}}$: Momentum Index Weight Vector generated from the portfolio constructed above.
 - $\lambda$: Regularization parameter controlling deviation from the benchmark  
 - $\mathbf{1}^\top w = 1$: Budget constraint
 - $w \geq 0$: Long-only constraint
