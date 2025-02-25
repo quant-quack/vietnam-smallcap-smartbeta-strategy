@@ -108,7 +108,7 @@ w_j = \frac{MOM_j^{(k)} - MOM^{(k)}}{N}, \quad k = 1,2,3,4.
 
 - **Formation and Holding Periods**
   - Past formation period: **12 months.**
-  - Future holding period: **one month.**
+  - Future holding period: **1 months.**
 - **Rolling of Subperiods**
   - The rolling of the subperiods adopts the non-overlapping holding period method.
 
@@ -121,7 +121,7 @@ The visualization of **stock price behavior** across different **capitalization 
 The **abnormal performance of loser stocks** across all three **capitalization groups** presents an opportunity to construct a **smart beta portfolio**. For a more **intuitive perspective**, let's examine the **performance of the three capitalization groups** within the **loser portfolio** through the table below.
 
 | Metric           | Bottom  | Mid     | Top     |
-|-----------------|---------|---------|---------|
+|:-----------------:|:---------:|:---------:|:---------:|
 | Annual return   | 0.0696  | 0.0440  | 0.0149  |
 | Annual volatility | 0.0750  | 0.0843  | 0.0697  |
 | Max drawdown   | -0.1642 | -0.2113 | -0.1696 |
@@ -149,14 +149,35 @@ Small-cap stocks also tend to exhibit superior performance in January, consisten
 
 #### Formation and Holding Periods  
 - **Formation period**: 12-month lookback.  
-- **Holding period**: One month forward.  
+- **Holding period**: 1-month forward.  
 
 #### Rolling of Subperiods  
 Subperiods are rolled using a **non-overlapping holding period** approach.  
 
 The adjusted **out-of-sample** portfolio performance is summarized as follows.
 
+![Small-Cap Smart Beta Performance](/reports/visualization/sml_smart_beta_performance.png)
+
+### Performance Metrics  
+
+| Metric            | Small-Cap Smart Beta  |
+|:------------------:|:------:|
+| **Annual return**      | 0.3521  |
+| **Annual volatility**  | 0.3040  |
+| **Max drawdown**       | -0.5632 |
+| **Sharpe ratio**       | 1.0646  |
+| **Sortino ratio**      | 2.2736  |
+| **Calmar ratio**       | 0.6251  |
+
+
 ## Portfolio Optimization
+
+The proposed strategy delivers an annual return of approximately **35%** (excluding additional costs), exhibiting relative stability. However, with a portfolio standard deviation of around **30%**, the **Sharpe ratio is not particularly appealing**, whereas the **Sortino ratio appears more favorable**.  
+
+To enhance risk-adjusted performance, we may seek to **minimize portfolio variance**, while ensuring that **portfolio weights do not deviate significantly** from the folded portfolio structure—preserving the allocation framework dictated by the **momentum-based arbitrage-weighting method**.  
+
+This leads to the following portfolio optimization problem...
+
 ### Regularized Global Minimum Variance (GMV) Portfolio  
 #### Optimization Problem:  
 ```math
@@ -173,9 +194,15 @@ where:
 - $\Sigma$: Covariance matrix of asset returns  
 - $w^{\text{index}}$: Benchmark index weight vector  
 - $\lambda$: Regularization parameter controlling deviation from the benchmark  
-- $\mathbf{1}^\top w = 1$: Budget constraint (fully invested portfolio)  
-- $w \geq 0$: Long-only constraint (no short selling)  
+- $\mathbf{1}^\top w = 1$: Budget constraint
+- $w \geq 0$: Long-only constraint
+
+To determine the suitable hyperparameter **λ**, we examine how the **Sharpe ratio** changes with different **λ** values, as depicted in the following figure. **Important note:** The illustration reflects the relationship between **λ** and the **Sharpe ratio** based on **in-sample data**.
 ![Impact of Scaling Factor on Sharpe Ratio](/reports/visualization/impact_of_lambda.png)
+*Figure 4: Impact of λ on the Sharpe ratio. The chart illustrates the relationship between λ and the Sharpe ratio based on in-sample data.*
+
+Based on the visualization, the **Sharpe ratio peaks** in the range of **0–0.01** and **converges to zero** as **λ** increases. Therefore, we select **λ** that maximizes the **Sharpe ratio** and proceed with **backtesting the portfolio using out-of-sample data** after solving the **optimization problem**.
+
 ## Performance Report
 ![Performance Dashboard (Out-of-sample)](/reports/visualization/performance_dashboard.png)
 
