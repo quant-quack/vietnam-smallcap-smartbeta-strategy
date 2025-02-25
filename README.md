@@ -113,9 +113,68 @@ w_j = \frac{MOM_j^{(k)} - MOM^{(k)}}{N}, \quad k = 1,2,3,4.
   - The rolling of the subperiods adopts the non-overlapping holding period method.
 
 ## Empirical Verification
-![Price behaviour of different market capitalization groups](/reports/visualization/empirical_verification.png)
-## Portfolio Optimization with Tracking-Error Constraints for Vietnam Stock Market
-![Impact of Scaling Factor on Sharpe Ratio](/reports/visualization/arbitrage_weighting.png)
+![Price behaviour of different market capitalization groups](/reports/visualization/empirical_verification.png)  
+*Figure 1: The image illustrates the price behavior of different market capitalization groups within the winner, loser, and arbitrage portfolios.*
+
+The visualization of **stock price behavior** across different **capitalization groups** in the **momentum portfolio** confirms the presence of the **negative momentum phenomenon** in the **Asian market overall and specifically in Vietnam**. This is evident in the **future holding period (or `out-of-sample period`)** performance of the **`Arbitrage Portfolio`** within the **small-cap group**, as reflected in the **declining cumulative return trend through the performance of `PMOM`**. This suggests that **stocks with strong past performance (Winner Stocks) tend to underperform** compared to those with **weaker past performance (Loser Stocks)**. A **similar pattern** is observed in the **mid-cap group**, whereas in the **large-cap group, the positive momentum effect is confirmed**.
+
+The **abnormal performance of loser stocks** across all three **capitalization groups** presents an opportunity to construct a **smart beta portfolio**. For a more **intuitive perspective**, let's examine the **performance of the three capitalization groups** within the **loser portfolio** through the table below.
+
+| Metric           | Bottom  | Mid     | Top     |
+|-----------------|---------|---------|---------|
+| Annual return   | 0.0696  | 0.0440  | 0.0149  |
+| Annual volatility | 0.0750  | 0.0843  | 0.0697  |
+| Max drawdown   | -0.1642 | -0.2113 | -0.1696 |
+| Sharpe ratio   | 0.9370  | 0.5539  | 0.2464  |
+| Sortino ratio  | 1.5540  | 0.9244  | 0.3596  |
+| Calmar ratio   | 0.4239  | 0.2084  | 0.0877  |
+
+
+## Small-cap Smart Beta Strategy for Vietnam Stock Market
+The **loser stocks in the small-cap group** exhibit **significantly superior performance** compared to those in the **mid-cap and large-cap groups**. Consequently, this segment is selected as the **universe** for constructing the **smart beta momentum portfolio** tailored for the **Vietnamese market**.  
+
+However, since **short selling is not permitted** in Vietnam, adjustments are necessary to align with market constraints while **preserving the momentum allocation structure** of the **arbitrage-weighting method**—where stocks with **momentum deviations further from the mean** receive **larger weights**. 
+
+![Arbitrage Weighting Method]( /reports/visualization/arbitrage_weighting.png )  
+*Figure 2: The image illustrates the momentum of individual stocks and the average momentum. Stocks with higher fluctuations relative to the mean (e.g., stock C) receive a higher weight allocation, whereas stocks with lower fluctuations (e.g., stock B) receive a lower weight allocation.*
+
+To accommodate a **long-only portfolio** while ensuring **all weights remain positive** and sum to **one**, the author applies the **`softmax` function** as a transformation mechanism. **For each portfolio weight vector $\mathbf{w}$ in the future holding period:** 
+```math
+w'_i = \frac{e^{w_i}}{\sum_{j} e^{w_j}}, \quad w'_i > 0, \quad \sum_{i} w'_i = 1.
+```
+Small-cap stocks also tend to exhibit superior performance in January, consistent with the findings of [Haug and Hirschey (2006)](https://doi.org/10.2469/faj.v62.n5.4284), under the adjusted backtesting framework:  
+
+#### Backtesting Periods  
+121 months, spanning `January 2013` to `December 2023`.  
+
+#### Formation and Holding Periods  
+- **Formation period**: 12-month lookback.  
+- **Holding period**: One month forward.  
+
+#### Rolling of Subperiods  
+Subperiods are rolled using a **non-overlapping holding period** approach.  
+
+The adjusted **out-of-sample** portfolio performance is summarized as follows.
+
+## Portfolio Optimization
+### Regularized Global Minimum Variance (GMV) Portfolio  
+#### Optimization Problem:  
+```math
+\min_w w^\top \Sigma w + \lambda \|w - w^{\text{index}}\|_{2}
+```
+
+$$
+st:  
+\mathbf{1}^\top w = 1, \quad w \geq 0
+$$
+
+where:
+- $w$: Portfolio weight vector  
+- $\Sigma$: Covariance matrix of asset returns  
+- $w^{\text{index}}$: Benchmark index weight vector  
+- $\lambda$: Regularization parameter controlling deviation from the benchmark  
+- $\mathbf{1}^\top w = 1$: Budget constraint (fully invested portfolio)  
+- $w \geq 0$: Long-only constraint (no short selling)  
 ![Impact of Scaling Factor on Sharpe Ratio](/reports/visualization/impact_of_lambda.png)
 ## Performance Report
 ![Performance Dashboard (Out-of-sample)](/reports/visualization/performance_dashboard.png)
